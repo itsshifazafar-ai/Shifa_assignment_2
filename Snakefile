@@ -88,5 +88,6 @@ rule call_variants:
     shell:
         """
         mkdir -p {VARIANT_DIR}
-        samtools mpileup -uf {input.ref} {input.bam} | bcftools call -mv -Ov -o {output}
+        bcftools mpileup -f {input.ref} {input.bam} -Ou | \
+        bcftools call -mv -Ov -o {output}
         """
