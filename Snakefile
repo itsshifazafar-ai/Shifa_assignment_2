@@ -8,7 +8,7 @@ REF_ID = "AF086833.2"
 rule all:
     input:
         f"{QC_DIR}/{SRA_ID}_fastqc.html",
-        f"{ALIGNED_DIR}/aligned.sorted.bam"
+        f"{ALIGNED_DIR}/aligned.sorted.bam.bai"
 
 rule download_data:
     output:
@@ -64,4 +64,14 @@ rule sort_bam:
     shell:
         """
         samtools sort {input} -o {output}
+        """
+
+rule index_bam:
+    input:
+        f"{ALIGNED_DIR}/aligned.sorted.bam"
+    output:
+        f"{ALIGNED_DIR}/aligned.sorted.bam.bai"
+    shell:
+        """
+        samtools index {input}
         """
