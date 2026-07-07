@@ -1,13 +1,14 @@
 RAW_DIR = "results/raw"
 QC_DIR = "results/qc"
 ALIGNED_DIR = "results/aligned"
+
 SRA_ID = "SRR1972739"
 REF_ID = "AF086833.2"
 
 rule all:
     input:
         f"{QC_DIR}/{SRA_ID}_fastqc.html",
-        f"{ALIGNED_DIR}/aligned.sam"
+        f"{ALIGNED_DIR}/aligned.sorted.bam"
 
 rule download_data:
     output:
@@ -53,4 +54,14 @@ rule align_reads:
         """
         mkdir -p {ALIGNED_DIR}
         bwa mem {input.ref} {input.reads} > {output}
+        """
+
+rule sort_bam:
+    input:
+        f"{ALIGNED_DIR}/aligned.sam"
+    output:
+        f"{ALIGNED_DIR}/aligned.sorted.bam"
+    shell:
+        """
+        samtools sort {input} -o {output}
         """
