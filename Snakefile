@@ -1,6 +1,7 @@
 RAW_DIR = "results/raw"
 QC_DIR = "results/qc"
 ALIGNED_DIR = "results/aligned"
+VARIANT_DIR = "results/variants"
 
 SRA_ID = "SRR1972739"
 REF_ID = "AF086833.2"
@@ -8,7 +9,8 @@ REF_ID = "AF086833.2"
 rule all:
     input:
         f"{QC_DIR}/{SRA_ID}_fastqc.html",
-        f"{ALIGNED_DIR}/aligned.sorted.bam.bai"
+        f"{ALIGNED_DIR}/aligned.sorted.bam.bai",
+        f"{VARIANT_DIR}/filtered_variants.vcf"
 
 rule download_data:
     output:
@@ -74,4 +76,17 @@ rule index_bam:
     shell:
         """
         samtools index {input}
+        """
+
+rule call_variants:
+    input:
+        bam=f"{ALIGNED_DIR}/aligned.sorted.bam",
+        bai=f"{ALIGNED_DIR}/aligned.sorted.bam.bai",
+        ref=f"{RAW_DIR}/reference.fasta"
+    output:
+        f"{VARIANT_DIR}/filtered_variants.vcf"
+    shell:
+        """
+        mkdir -p {VARIANT_DIR}
+        samtools mpileup -uf {input.ref} {input.bam} | bcftools call -mv -Ov -o {output}
         """
