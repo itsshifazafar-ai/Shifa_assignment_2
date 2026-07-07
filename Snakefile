@@ -14,9 +14,9 @@ rule download_data:
     shell:
         """
         mkdir -p {RAW_DIR}
-        efetch -db nucleotide -id {REF_ID} -format fasta > {output.ref}
+        efetch -db nucleotide -id {REF_ID} -format fasta > {output.ref} || true
         prefetch {SRA_ID} -O {RAW_DIR}
-        fasterq-dump {RAW_DIR}/{SRA_ID}/{SRA_ID}.sra -O {RAW_DIR}
+        fastq-dump -X 10000 --outdir {RAW_DIR} {RAW_DIR}/{SRA_ID}/{SRA_ID}.sra
         """
 
 rule fastqc:
